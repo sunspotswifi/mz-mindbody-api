@@ -1,12 +1,15 @@
 <?php
 namespace MZ_Mindbody\Inc\Libraries;
 
+use MZ_Mindbody as MZ;
+
 class MBO_V6_API_METHODS { 
 	// set apiServices array with Mindbody endpoints
 	// source: https://github.com/mindbody/API-Examples/tree/master/SDKs/PHP/SwaggerClient-php/docs/Api
 	
 	public  $methods;
-	private $headers_basic = array();
+	private $headersBasic = array();
+	private $headersAuthorized = array();
 	
 	protected $endpointClasses = 'https://api.mindbodyonline.com/public/v6/class';
 	protected $endpointAppointment = 'https://api.mindbodyonline.com/public/v6/appointment';
@@ -20,10 +23,16 @@ class MBO_V6_API_METHODS {
 	
 	/**
 	* Initialize the apiServices and apiMethods arrays
+	*
+	* For calls which require higher levels of authorization, use headerAuthorized.
 	*/
 	public function __construct( $headers = array() ) {
 	
 		$this->headersBasic = $headers;
+		
+		$this->headersAuthorized = array_merge($headers, [
+		                                        'Authorization' => get_option('mz_mbo_token', ['stored_time' => '', 'AccessToken' => ''])['AccessToken']
+		                                        ]);
 		
 		$this->methods = [
 			'AppointmentService' => [
@@ -299,7 +308,7 @@ class MBO_V6_API_METHODS {
 										'method' => 'POST',
 										'name' => 'CheckoutShoppingCart', 
 										'endpoint' => $this->endpointSale . '/checkoutshoppingcart',
-										'headers' => $this->headersBasic
+										'headers' => $this->headersAuthorized
 									 ],
 				'GetAcceptedCardTypes' => [
 										'method' => 'GET',
@@ -311,7 +320,7 @@ class MBO_V6_API_METHODS {
 										'method' => 'GET',
 										'name' => 'GetContracts', 
 										'endpoint' => $this->endpointSale . '/contracts',
-										'headers' => $this->headersBasic
+										'headers' => $this->headersAuthorized
 									 ],
 				'GetCustomPaymentMethods' => [
 										'method' => 'GET',
@@ -360,49 +369,49 @@ class MBO_V6_API_METHODS {
 				'GetActivationCode' => [
 										'method' => 'GET',
 										'name' => 'GetActivationCode', 
-										'endpoint' => $this->endpointPayroll . '/activationcode',
+										'endpoint' => $this->endpointSite . '/activationcode',
 										'headers' => $this->headersBasic
 									 ],
 				'GetLocations' => [
 										'method' => 'GET',
 										'name' => 'GetLocations', 
-										'endpoint' => $this->endpointPayroll . '/locations',
+										'endpoint' => $this->endpointSite . '/locations',
 										'headers' => $this->headersBasic
 									 ],
 				'GetGenders' => [
 										'method' => 'GET',
 										'name' => 'GetGenders', 
-										'endpoint' => $this->endpointPayroll . '/genders',
+										'endpoint' => $this->endpointSite . '/genders',
 										'headers' => $this->headersBasic
 									 ],
 				'GetMemberships' => [
 										'method' => 'GET',
 										'name' => 'GetMemberships', 
-										'endpoint' => $this->endpointPayroll . '/memberships',
+										'endpoint' => $this->endpointSite . '/memberships',
 										'headers' => $this->headersBasic
 									 ],
 				'GetPrograms' => [
 										'method' => 'GET',
 										'name' => 'GetPrograms', 
-										'endpoint' => $this->endpointPayroll . '/programs',
+										'endpoint' => $this->endpointSite . '/programs',
 										'headers' => $this->headersBasic
 									 ],
 				'GetResources' => [
 										'method' => 'GET',
 										'name' => 'GetResources', 
-										'endpoint' => $this->endpointPayroll . '/resources',
+										'endpoint' => $this->endpointSite . '/resources',
 										'headers' => $this->headersBasic
 									 ],
 				'GetSessionTypes' => [
 										'method' => 'GET',
 										'name' => 'GetSessionTypes', 
-										'endpoint' => $this->endpointPayroll . '/sessiontypes',
+										'endpoint' => $this->endpointSite . '/sessiontypes',
 										'headers' => $this->headersBasic
 									 ],
 				'GetSites' => [
 										'method' => 'GET',
 										'name' => 'GetSites', 
-										'endpoint' => $this->endpointPayroll . '/sites',
+										'endpoint' => $this->endpointSite . '/sites',
 										'headers' => $this->headersBasic
 									 ]
 			],

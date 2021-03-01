@@ -3,8 +3,8 @@ Contributors: mikeill, rtzee
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A95ZEELLHGECE
 Tags: mindbody, schedule, calendar, yoga, MBO, mindbodyonline, gym, parkour, mbo, mindbodyonline.
 Requires at least: 3.0.1
-Tested up to: 5.4.5
-Stable tag: 2.6.4
+Tested up to: 5.6.1
+Stable tag: 2.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,59 @@ You need to register a developer account with MindBody, which costs $5+ per webs
 5. Admin Page
 
 == Changelog ==
+
+= v2.8.0 =
+Bugfix: Catch error thrown when Too Many API Calls level reached.
+
+= v2.7.9 =
+Notify admin of too many API calls within add_action plugins_loaded hook.
+
+= v2.7.8 =
+Just in case faulty deploy not fixed previously.
+
+= v2.7.7 =
+Fix faulty deploy.
+
+= v2.7.6 =
+Bugfix: Remove test print.
+Refactor token management, moving storage out of MBO api class.
+
+= v2.7.5 =
+Bugfix: Correct endpoint for Site requests.
+Add authorization header for some endpoints.
+
+= v2.7.4 =
+Support Authorized MBO transactions.
+
+= v2.7.3 =
+Add Bootstrap modal css.
+
+= v2.7.2 =
+Update admin api test script, removing a call to log function.
+
+= v2.7.1 =
+Debug: Fix another coding error in class-activator.
+
+= v2.7.0 =
+Debug: Fix coding error in class-activator. 
+
+= v2.6.9 =
+Enhancement: Change button text to "waitlist" for waitlist only registrations. 
+
+= v2.6.8 =
+Enhancement: Allow specification of SessionTypeIds in shortcode to specify retrieval data 
+
+= v2.6.7 =
+Bugfix: Just passing token string, as opposed to object so don't try to get property.
+Enhancement: Disable signup button when class is at capacity and no waitlist available.
+Bugfix: jQuery Staff popup conflict resolved.
+Enhancement: Allow admin to set schedule transient duration.
+
+= v2.6.6 =
+Bugfix: Cancelled classes were being hidden even when not configured to be hidden.
+
+= v2.6.5 =
+Remove Pad empty calendar days with blank rows until bugs worked out.
 
 = v2.6.4 =
 Pad empty calendar days with blank rows.

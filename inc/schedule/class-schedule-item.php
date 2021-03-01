@@ -522,6 +522,9 @@ class Schedule_Item {
         $this->classDescription = isset($schedule_item['ClassDescription']['Description']) ? $schedule_item['ClassDescription']['Description'] : '';
         $this->level = isset($schedule_item['ClassDescription']['Level']['Name']) ? $schedule_item['ClassDescription']['Level']['Name'] : '';
         $this->staffImage = isset($schedule_item['Staff']['ImageUrl']) ? $schedule_item['Staff']['ImageUrl'] : '';
+        $this->is_waitlist_available = isset($schedule_item['IsWaitlistAvailable']) ? $schedule_item['IsWaitlistAvailable']: '';
+        $this->total_booked = isset($schedule_item['TotalBooked']) ? $schedule_item['TotalBooked']: '';
+        $this->max_capacity = isset($schedule_item['MaxCapacity']) ? $schedule_item['MaxCapacity']: '';
         $this->ID = $schedule_item['Id'];
         $this->sTG = $schedule_item['ClassDescription']['Program']['Id'];
         $this->class_schedule_id = $schedule_item['ClassScheduleId'];
@@ -596,9 +599,6 @@ class Schedule_Item {
                 }
                 $linkArray['data-staffImage'] = ($this->staffImage != '') ? $this->staffImage : '';
                 $link->set('href', NS\PLUGIN_NAME_URL . 'inc/frontend/views/modals/modal_descriptions.php');
-// print_r('linkArray:');
-// print_r($linkArray);
-// die();
                 break;
 
             case 'class':
@@ -620,14 +620,29 @@ class Schedule_Item {
                 break;
 
             case 'signup':
-
+                
                 $linkArray['class'] = 'btn btn-primary';
-
+                
+                $linkArray['title'] = apply_filters( 'mz-mbo-registrations-available', __('Registrations Available', 'mz-mindbody-api'));
+                
+                if (!empty($this->max_capacity) && $this->total_booked >= $this->max_capacity):
+                    if (false == $this->is_waitlist_available):
+                        $linkArray['class'] = 'btn btn-primary disabled';
+                    endif;
+                    if (true == $this->is_waitlist_available):
+                        $linkArray['class'] = 'btn btn-primary waitlist-only';
+                        $linkArray['title'] = apply_filters( 'mz-mbo-waitlist-only', __('Waitlist Only', 'mz-mindbody-api'));
+                    endif;
+                endif;
+                
                 // If grid, we want icon and not text copy for signup.
                 if ($sub_type === 'grid'):
                     $linkArray['text'] = '<svg class="icon sign-up"><use xlink:href="#si-bootstrap-log-in"/></use></svg>';
                 else:
                     $linkArray['text'] = __('Sign-Up', 'mz-mindbody-api');
+                    if ($this->total_booked >= $this->max_capacity && true == $this->is_waitlist_available):
+                        $linkArray['text'] = apply_filters( 'mz-mbo-waitlist-button-text', __('Waitlist', 'mz-mindbody-api'));
+                    endif;
                 endif;
 
                 $linkArray['data-time'] = date_i18n(Core\MZ_Mindbody_Api::$date_format . ' ' . Core\MZ_Mindbody_Api::$time_format, strtotime($this->startDateTime));
@@ -646,11 +661,11 @@ class Schedule_Item {
 
                 // else:
 
-                    $linkArray['target'] = '_blank';
-                    $link->set('href', $this->mbo_url);
+                $linkArray['target'] = '_blank';
+                $link->set('href', $this->mbo_url);
 
                 // endif;
-
+                
                 break;
 
         }

@@ -28,14 +28,34 @@ class MBO_V6_API {
 	protected $extraCredentials = array();
 	
 	protected $basic_options;
+	
+	/*
+	 * Get stored tokens when good and store new ones
+	 *
+	 */
+	protected $token_management;
+	
+	
+	/*
+     * Shortcode Attributes
+     *
+     * @since 2.6.7
+     * @access private
+     */
+	private $atts;
 
 	/**
 	* Initialize the apiServices and apiMethods arrays
 	*/
-	public function __construct( $mbo_dev_credentials = array()) {
+	public function __construct( $mbo_dev_credentials = array(), $atts = array() ) {
 
         // $mbo_dev_credentials = $this->basic_options = Core\MZ_Mindbody_Api::$basic_options;
 		$this->basic_options = $mbo_dev_credentials;
+		
+		$this->atts = $atts;
+		
+		$this->token_management = new Common\Token_Management;		
+		
 		// set credentials into headers
 		if (!empty($mbo_dev_credentials)) {
 			//if(!empty($mbo_dev_credentials['mz_mbo_app_name'])) {
@@ -149,7 +169,8 @@ class MBO_V6_API {
 		// Certain methods want json strings
 		$encoded_request_body = [
 			'AddClient',
-			'SendPasswordResetEmail'
+			'SendPasswordResetEmail',
+			'CheckoutShoppingCart'
 		];
 		
 		// Certain methods don't require credentials
@@ -159,16 +180,27 @@ class MBO_V6_API {
 							array( 
 									'Username' => $this->format_username(), 
 									'Password' => $this->extraCredentials['Password'],
-									'Limit' => 200
+									'Limit' => 200,
 							)
 						);
-					
-			$request_body['Access'] = $this->tokenRequest( $restMethod );
 			
+			// Maybe there's a stored token to use
+			$token = $this->token_management->get_stored_token();
+			
+		    if ( ctype_alnum($token['AccessToken']) ) {
+		        $request_body['Access'] = $token['AccessToken'];
+		    } else {
+		        $request_body['Access'] = $this->tokenRequest( $restMethod );
+		    }
+								
 		} else {
 		
 			$request_body = $requestData;
 			
+		}
+		
+		if (!empty($this->atts['session_type_ids'])) {
+		    $request_body['SessionTypeIds'] = $this->atts['session_type_ids'];
 		}
 		
 		if ( in_array($restMethod['name'], $encoded_request_body) ) {
@@ -179,7 +211,7 @@ class MBO_V6_API {
 		
 		// For some reason, for this call, we don't want to convert
 		// 'body' into a json string, as we do in the token request
-		$response = wp_remote_post( $restMethod['endpoint'], 
+		$response = wp_remote_request( $restMethod['endpoint'], 
 			array(
 				'method' => $restMethod['method'],
 				'timeout' => 45,
@@ -229,13 +261,7 @@ class MBO_V6_API {
 	protected function tokenRequest($restMethod) {
 	
 		$this->tokenRequestTries--;
-		
-		$tm = new Common\Token_Management;
-		
-		$token = $tm->get_stored_token();
-				
-		if ( ctype_alnum($token) ) return $token;
-				
+						
 		$request_body = array( 
 								'Username' => $this->format_username(), 
 								'Password' => $this->extraCredentials['Password'] 
@@ -269,7 +295,7 @@ class MBO_V6_API {
 					return false;
 				}
 
-				$tm->save_token_to_option($response_body);
+				$this->token_management->save_token_to_option($response_body);
 				return $response_body;
 		}
 	}
@@ -328,22 +354,32 @@ class MBO_V6_API {
      * 
      */
     private function api_call_limiter() {
-    
+        
     	// Don't limit if using sandbox
     	if ((isset(NS\MZMBO()::$basic_options['mz_mindbody_siteID'])) && (NS\MZMBO()::$basic_options['mz_mindbody_siteID'] == '-99')) return true;
     	
     	if (NS\MZMBO()::$mz_mbo_api_calls['calls'] - 1200 > NS\MZMBO()::$advanced_options['api_call_limit']) {
-    		$to = get_option('admin_email');
-			$subject = __( 'Large amount of MBO API Calls', 'mz-mindbody-api' );
-			$message = sprintf(__('Check your website and MBO. There have been %1$s calls to the API so far today. You have set a maximum of %2$s in the Admin.', 'mz-mindbody-api'),
-            					NS\MZMBO()::$mz_mbo_api_calls['calls'], NS\MZMBO()::$advanced_options['api_call_limit']);
-			$headers = array('Content-Type: text/html; charset=UTF-8');
-			wp_mail( $to, $subject, $message, $headers);
+    		add_action( 'plugins_loaded', array($this, 'admin_call_excess_alert'), 10);
     	};
     	if (NS\MZMBO()::$mz_mbo_api_calls['calls'] > NS\MZMBO()::$advanced_options['api_call_limit']) {
     		return false;
     	};
     	return true;
+    }
+    
+    
+    /*
+     * Make the admin notification via wp_mail
+     * 
+     * 
+     */
+    public function admin_call_excess_alert(){
+        $to = get_option('admin_email');
+        $subject = __( 'Large amount of MBO API Calls', 'mz-mindbody-api' );
+        $message = sprintf(__('Check your website and MBO. There have been %1$s calls to the API so far today. You have set a maximum of %2$s in the Admin.', 'mz-mindbody-api'),
+                            NS\MZMBO()::$mz_mbo_api_calls['calls'], NS\MZMBO()::$advanced_options['api_call_limit']);
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        wp_mail($to, $subject, $message, $headers);
     }
     
 	public function debug() {
