@@ -388,7 +388,7 @@ class MBO_V6_API_METHODS {
 										'method' => 'GET',
 										'name' => 'GetMemberships', 
 										'endpoint' => $this->endpointSite . '/memberships',
-										'headers' => $this->headersBasic
+										'headers' => $this->headersAuthorized
 									 ],
 				'GetPrograms' => [
 										'method' => 'GET',

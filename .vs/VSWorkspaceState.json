@@ -1,7 +1,13 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\inc",
+    "\\inc\\admin",
+    "\\inc\\backend",
+    "\\inc\\common",
+    "\\inc\\core",
+    "\\inc\\libraries"
   ],
-  "SelectedNode": "\\index.php",
+  "SelectedNode": "\\inc\\admin\\class-admin.php",
   "PreviewInSolutionExplorer": false
 }

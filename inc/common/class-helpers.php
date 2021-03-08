@@ -70,7 +70,9 @@ class Helpers {
      */
     public function api_log($message, $file_path='')
     {
-        $file_path = ( ($file_path == '') || !file_exists($file_path) ) ? WP_CONTENT_DIR . '/mbo_api.log' : $file_path;
+        $api_log_file = isset(NS\Inc\Core\MZ_Mindbody_Api::$advanced_options['api_log_file']) ? NS\Inc\Core\MZ_Mindbody_Api::$advanced_options['api_log_file'] : WP_CONTENT_DIR . '/mbo_api.log';
+
+        $file_path = ( ($file_path == '') || !file_exists($file_path) ) ? $api_log_file : $file_path;
 
         // Just keep up to seven days worth of data
         if (file_exists($file_path)){

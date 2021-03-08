@@ -384,6 +384,17 @@ class Settings_Page {
             )
         );
 
+        // Field: Log File Location
+        self::$wposa_obj->add_field(
+            'mz_mbo_advanced',
+            array(
+                'id'      => 'api_log_file',
+                'type'    => 'text',
+                'name'    => __( 'API Log File Name', 'mz-mindbody-api' ),
+                'desc'    => __( 'You can change the default log file for MBO API calls.', 'mz-mindbody-api' )
+            )
+        );
+
         // Field: Regenerate Class Owners
         self::$wposa_obj->add_field(
             'mz_mbo_advanced',
