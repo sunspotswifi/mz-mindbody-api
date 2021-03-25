@@ -72,6 +72,8 @@ class Helpers {
     {
         $api_log_file = isset(NS\Inc\Core\MZ_Mindbody_Api::$advanced_options['api_log_file']) ? NS\Inc\Core\MZ_Mindbody_Api::$advanced_options['api_log_file'] : WP_CONTENT_DIR . '/mbo_api.log';
 
+        if ( !file_exists($api_log_file) ) $api_log_file = WP_CONTENT_DIR . '/mbo_api.log';
+
         $file_path = ( ($file_path == '') || !file_exists($file_path) ) ? $api_log_file : $file_path;
 
         // Just keep up to seven days worth of data
